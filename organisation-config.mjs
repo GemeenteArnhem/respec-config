@@ -380,6 +380,10 @@ function buildRespecConfig(merged) {
     respecConfig.localBiblio = config.localBiblio;
   }
 
+  if (config.lint !== undefined) {
+    respecConfig.lint = config.lint;
+  }
+
   return respecConfig;
 }
 

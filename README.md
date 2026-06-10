@@ -100,6 +100,7 @@ loadRespecWithConfiguration({
 ```
 
 `github`, `alternateFormats` en `license` zijn optioneel. Als je ze niet wilt tonen, kun je ze weglaten of expliciet op `false` zetten.
+Je kunt ook `lint: false` gebruiken om ReSpec-waarschuwingen niet in beeld te tonen, bijvoorbeeld bij Nederlandstalige documenten waarvoor ReSpec niet alle controles ondersteunt.
 
 ## Arnhem documentstatussen
 
