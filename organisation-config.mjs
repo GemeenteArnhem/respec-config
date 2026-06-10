@@ -2,6 +2,9 @@ import {
   loadRespecWithConfiguration as loadLogiusRespecWithConfiguration,
 } from "https://logius-standaarden.github.io/publicatie/respec/organisation-config.mjs";
 
+const FALLBACK_GITHUB = "https://github.com/GemeenteArnhem/respec-config";
+const FALLBACK_LICENSE = "cc-by";
+
 const arnhemOrganisationConfig = {
   nl_organisationName: "Gemeente Arnhem",
 
@@ -113,8 +116,148 @@ function mergeDeep(base = {}, override = {}) {
   return result;
 }
 
+function removeDtDdByLabel(doc, labels = []) {
+  const dts = [...doc.querySelectorAll(".head dt")];
+
+  for (const dt of dts) {
+    const text = (dt.textContent || "").trim().toLowerCase();
+
+    if (labels.some(label => text.includes(label.toLowerCase()))) {
+      const dd = dt.nextElementSibling;
+      dt.remove();
+      if (dd && dd.tagName.toLowerCase() === "dd") {
+        dd.remove();
+      }
+    }
+  }
+}
+
+function removeBlocksByText(doc, snippets = []) {
+  const elements = [...doc.querySelectorAll(".head p, .head div, .head dd, section p, section div")];
+
+  for (const el of elements) {
+    const text = (el.textContent || "").trim().toLowerCase();
+
+    if (snippets.some(snippet => text.includes(snippet.toLowerCase()))) {
+      el.remove();
+    }
+  }
+}
+
+function removeLinksByHref(doc, patterns = []) {
+  const links = [...doc.querySelectorAll("a[href]")];
+
+  for (const link of links) {
+    const href = link.getAttribute("href") || "";
+
+    if (patterns.some(pattern => href.includes(pattern))) {
+      const parent = link.closest("dd, p, div, li");
+      if (parent) {
+        parent.remove();
+      } else {
+        link.remove();
+      }
+    }
+  }
+}
+
+function cleanupOptionalOutput(doc, options = {}) {
+  const {
+    hideGitHub = false,
+    hideLicense = false,
+    hideAlternateFormats = false,
+  } = options;
+
+  if (hideGitHub) {
+    removeDtDdByLabel(doc, ["Doe mee", "Participate"]);
+    removeLinksByHref(doc, ["/issues", "/pull", "/commits", "github.com"]);
+  }
+
+  if (hideLicense) {
+    removeDtDdByLabel(doc, ["Dit document valt onder de volgende licentie", "This document is licensed under"]);
+    removeBlocksByText(doc, [
+      "Dit document valt onder de volgende licentie",
+      "This document is licensed under",
+      "Creative Commons Attribution 4.0 International Public License",
+      "CC-BY",
+    ]);
+  }
+
+  if (hideAlternateFormats) {
+    removeDtDdByLabel(doc, [
+      "Dit document is ook beschikbaar in dit niet-normatieve formaat",
+      "This document is also available in these non-normative format",
+    ]);
+    removeLinksByHref(doc, [".pdf"]);
+    removeBlocksByText(doc, [
+      "Dit document is ook beschikbaar in dit niet-normatieve formaat",
+      "This document is also available in these non-normative format",
+    ]);
+  }
+}
+
+function normalizeArnhemConfig(config) {
+  const normalized = { ...config };
+
+  const hideGitHub = normalized.github === false;
+  const hideLicense = normalized.license === false;
+  const hideAlternateFormats = normalized.alternateFormats === false;
+
+  /*
+    pubDomain "arnhem" accepteren als invoer,
+    maar intern mappen naar "st" om door de Logius validatie te komen.
+  */
+  if (typeof normalized.pubDomain === "string" && normalized.pubDomain.toLowerCase() === "arnhem") {
+    normalized._arnhemPubDomain = "arnhem";
+    normalized.pubDomain = "st";
+  }
+
+  /*
+    Github is in de huidige Logius laag verplicht.
+    Daarom geven we tijdelijk een fallback mee,
+    en halen we het blok daarna weer weg in postProcess.
+  */
+  if (hideGitHub || !normalized.github) {
+    normalized.github = FALLBACK_GITHUB;
+  }
+
+  /*
+    Licentie optioneel maken.
+    Bij false tijdelijke fallback,
+    daarna verwijderen we het zichtbare blok.
+  */
+  if (hideLicense || !normalized.license) {
+    normalized.license = FALLBACK_LICENSE;
+  }
+
+  /*
+    Alternate formats optioneel maken.
+    Bij false gewoon lege lijst.
+  */
+  if (hideAlternateFormats) {
+    normalized.alternateFormats = [];
+  }
+
+  const existingPostProcess = Array.isArray(normalized.postProcess)
+    ? normalized.postProcess
+    : [];
+
+  normalized.postProcess = [
+    ...existingPostProcess,
+    async doc => {
+      cleanupOptionalOutput(doc, {
+        hideGitHub,
+        hideLicense,
+        hideAlternateFormats,
+      });
+    },
+  ];
+
+  return normalized;
+}
+
 export function loadRespecWithConfiguration(documentConfig = {}) {
-  const mergedConfig = mergeDeep(arnhemOrganisationConfig, documentConfig);
+  let mergedConfig = mergeDeep(arnhemOrganisationConfig, documentConfig);
 
   if (!mergedConfig.publishers) {
     mergedConfig.publishers = [
@@ -124,6 +267,8 @@ export function loadRespecWithConfiguration(documentConfig = {}) {
       },
     ];
   }
+
+  mergedConfig = normalizeArnhemConfig(mergedConfig);
 
   return loadLogiusRespecWithConfiguration(mergedConfig);
 }
