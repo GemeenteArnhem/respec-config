@@ -58,6 +58,7 @@ In deze file staan onder andere:
 - `nl_organisationName`
 - `logos`
 - `localizationStrings`
+- `localBiblio`
 - `labelColor`
 - `licenses`
 - standaard publicatie-instellingen

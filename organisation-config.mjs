@@ -117,6 +117,16 @@ const arnhemOrganisationConfig = {
     },
   ],
 
+  localBiblio: {
+    SemVer: {
+      title: "Semantic Versioning 2.0.0",
+      href: "https://semver.org/",
+      authors: ["Tom Preston-Werner"],
+      status: "Living Document",
+      publisher: "semver.org",
+    },
+  },
+
   licenses: ARNHEM_DEFAULT_LICENSES,
 };
 
