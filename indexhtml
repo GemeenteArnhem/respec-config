@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <title>Gemeente Arnhem ReSpec Config</title>
+</head>
+<body>
+  <h1>Gemeente Arnhem ReSpec Config</h1>
+  <p>Deze repository host centrale ReSpec configuratie voor Gemeente Arnhem.</p>
+  <ul>
+    <li><a href="./organisation-config.mjs">organisation-config.mjs</a></li>
+    <li><a href="./style/arnhem-respec.css">arnhem-respec.css</a></li>
+    <li><a href="./style/logos/arnhem-logo.webp">arnhem-logo.webp</a></li>
+  </ul>
+</body>
+</html>
