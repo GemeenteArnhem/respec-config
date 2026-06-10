@@ -93,9 +93,13 @@ loadRespecWithConfiguration({
       companyURL: "https://www.arnhem.nl"
     }
   ],
-  github: "https://github.com/GemeenteArnhem/api-standaard"
+  github: "https://github.com/GemeenteArnhem/api-standaard",
+  alternateFormats: false,
+  license: false
 });
 ```
+
+`github`, `alternateFormats` en `license` zijn optioneel. Als je ze niet wilt tonen, kun je ze weglaten of expliciet op `false` zetten.
 
 ## Arnhem documentstatussen
 
@@ -154,7 +158,7 @@ Voorbeelden:
 - publicatiedatum
 - versie
 - `shortName`
-- GitHub repository
+- GitHub repository, indien van toepassing
 - inhoud van het document
 
 ## Publicatie

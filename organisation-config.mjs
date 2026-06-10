@@ -1,12 +1,47 @@
-import {
-  loadRespecWithConfiguration as loadLogiusRespecWithConfiguration,
-} from "https://logius-standaarden.github.io/publicatie/respec/organisation-config.mjs";
+const ARNHEM_STATUS_LABELS = {
+  wv: "Werkversie",
+  cv: "Consultatieversie",
+  vv: "Versie ter vaststelling",
+  def: "Vastgestelde versie",
+  basis: "Document",
+  eo: "Verouderde versie",
+  tg: "Teruggetrokken versie",
+};
 
-const FALLBACK_GITHUB = "https://github.com/GemeenteArnhem/respec-config";
-const FALLBACK_LICENSE = "cc-by";
+const ARNHEM_STATUS_TEXT = {
+  wv: "Dit is een werkversie die op elk moment kan worden gewijzigd, verwijderd of vervangen door andere documenten.",
+  cv: "Dit is een consultatieversie. Reacties kunnen worden ingediend via de aangegeven beheerroute.",
+  vv: "Dit is een versie ter vaststelling. Wijzigingen naar aanleiding van consultaties zijn doorgevoerd.",
+  def: "Dit is de definitieve versie van dit document. Wijzigingen naar aanleiding van consultaties zijn doorgevoerd.",
+  basis: "Dit is een document zonder officiele status.",
+  eo: "Dit document is verouderd.",
+  tg: "Dit document is teruggetrokken.",
+};
+
+const ARNHEM_TYPE_LABELS = {
+  st: "Standaard",
+  ak: "Architectuurkader",
+  api: "API-standaard",
+  gs: "Gegevensstandaard",
+  ar: "Arnhemrichtlijn",
+  wa: "Werkafspraak Arnhem",
+  bd: "Beheerdocumentatie",
+  bp: "Best practice",
+  al: "Algemeen document",
+};
+
+const ARNHEM_DEFAULT_LICENSES = {
+  "cc-by": {
+    name: "Creative Commons Attribution 4.0 International Public License",
+    short: "CC-BY",
+    url: "https://creativecommons.org/licenses/by/4.0/legalcode",
+    image: "https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by.png",
+  },
+};
 
 const arnhemOrganisationConfig = {
   nl_organisationName: "Gemeente Arnhem",
+  pubDomain: "arnhem",
 
   logos: [
     {
@@ -34,23 +69,8 @@ const arnhemOrganisationConfig = {
 
   localizationStrings: {
     nl: {
-      wv: "Werkversie",
-      cv: "Consultatieversie",
-      vv: "Versie ter vaststelling",
-      def: "Vastgestelde versie",
-      basis: "Document",
-      eo: "Verouderde versie",
-      tg: "Teruggetrokken versie",
-
-      st: "Standaard",
-      ak: "Architectuurkader",
-      api: "API-standaard",
-      gs: "Gegevensstandaard",
-      ar: "Arnhemrichtlijn",
-      wa: "Werkafspraak Arnhem",
-      bd: "Beheerdocumentatie",
-      bp: "Best practice",
-      al: "Algemeen document",
+      ...ARNHEM_STATUS_LABELS,
+      ...ARNHEM_TYPE_LABELS,
     },
     en: {
       wv: "Draft",
@@ -76,11 +96,7 @@ const arnhemOrganisationConfig = {
   sotdText: {
     nl: {
       sotd: "Status van dit document",
-      def: "Dit is de definitieve versie van dit document. Wijzigingen naar aanleiding van consultaties zijn doorgevoerd.",
-      wv: "Dit is een werkversie die op elk moment kan worden gewijzigd, verwijderd of vervangen door andere documenten.",
-      cv: "Dit is een consultatieversie. Reacties kunnen worden ingediend via de aangegeven beheerroute.",
-      vv: "Dit is een versie ter vaststelling. Wijzigingen naar aanleiding van consultaties zijn doorgevoerd.",
-      basis: "Dit is een document zonder officiele status.",
+      ...ARNHEM_STATUS_TEXT,
     },
     en: {
       sotd: "Status of This Document",
@@ -89,8 +105,19 @@ const arnhemOrganisationConfig = {
       cv: "This is a consultation version. Comments may be submitted through the indicated governance route.",
       vv: "This is a version proposed for approval. Edits resulting from consultations have been applied.",
       basis: "This document has no official standing.",
+      eo: "This document is outdated.",
+      tg: "This document has been rescinded.",
     },
   },
+
+  publishers: [
+    {
+      name: "Gemeente Arnhem",
+      url: "https://www.arnhem.nl",
+    },
+  ],
+
+  licenses: ARNHEM_DEFAULT_LICENSES,
 };
 
 function mergeDeep(base = {}, override = {}) {
@@ -116,161 +143,261 @@ function mergeDeep(base = {}, override = {}) {
   return result;
 }
 
-function removeDtDdByLabel(doc, labels = []) {
-  const dts = [...doc.querySelectorAll(".head dt")];
+function normalizeKey(value = "") {
+  return String(value).trim().toLowerCase();
+}
 
-  for (const dt of dts) {
-    const text = (dt.textContent || "").trim().toLowerCase();
+function formatDutchDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return dateString;
 
-    if (labels.some(label => text.includes(label.toLowerCase()))) {
-      const dd = dt.nextElementSibling;
-      dt.remove();
-      if (dd && dd.tagName.toLowerCase() === "dd") {
-        dd.remove();
-      }
+  return new Intl.DateTimeFormat("nl-NL", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+function createEl(doc, tag, options = {}) {
+  const el = doc.createElement(tag);
+
+  if (options.className) el.className = options.className;
+  if (options.text) el.textContent = options.text;
+
+  if (options.attrs) {
+    for (const [key, value] of Object.entries(options.attrs)) {
+      el.setAttribute(key, value);
     }
   }
-}
 
-function removeBlocksByText(doc, snippets = []) {
-  const elements = [...doc.querySelectorAll(".head p, .head div, .head dd, section p, section div")];
-
-  for (const el of elements) {
-    const text = (el.textContent || "").trim().toLowerCase();
-
-    if (snippets.some(snippet => text.includes(snippet.toLowerCase()))) {
-      el.remove();
-    }
+  if (options.html) {
+    el.innerHTML = options.html;
   }
+
+  return el;
 }
 
-function removeLinksByHref(doc, patterns = []) {
-  const links = [...doc.querySelectorAll("a[href]")];
+function ensureSotdSection(doc) {
+  let sotd = doc.querySelector("#sotd");
+  if (!sotd) {
+    sotd = doc.createElement("section");
+    sotd.id = "sotd";
+    doc.body.prepend(sotd);
+  }
+  return sotd;
+}
 
-  for (const link of links) {
-    const href = link.getAttribute("href") || "";
-
-    if (patterns.some(pattern => href.includes(pattern))) {
-      const parent = link.closest("dd, p, div, li");
-      if (parent) {
-        parent.remove();
-      } else {
-        link.remove();
-      }
-    }
+function clearChildren(node) {
+  while (node.firstChild) {
+    node.removeChild(node.firstChild);
   }
 }
 
-function cleanupOptionalOutput(doc, options = {}) {
-  const {
-    hideGitHub = false,
-    hideLicense = false,
-    hideAlternateFormats = false,
-  } = options;
+function injectSotd(doc, config) {
+  const sotd = ensureSotdSection(doc);
+  clearChildren(sotd);
 
-  if (hideGitHub) {
-    removeDtDdByLabel(doc, ["Doe mee", "Participate"]);
-    removeLinksByHref(doc, ["/issues", "/pull", "/commits", "github.com"]);
-  }
+  const statusKey = normalizeKey(config.specStatus || "basis");
+  const statusHeading =
+    config.sotdText?.nl?.sotd ||
+    arnhemOrganisationConfig.sotdText.nl.sotd;
 
-  if (hideLicense) {
-    removeDtDdByLabel(doc, ["Dit document valt onder de volgende licentie", "This document is licensed under"]);
-    removeBlocksByText(doc, [
-      "Dit document valt onder de volgende licentie",
-      "This document is licensed under",
-      "Creative Commons Attribution 4.0 International Public License",
-      "CC-BY",
-    ]);
-  }
+  const statusText =
+    config.sotdText?.nl?.[statusKey] ||
+    arnhemOrganisationConfig.sotdText.nl[statusKey] ||
+    arnhemOrganisationConfig.sotdText.nl.basis;
 
-  if (hideAlternateFormats) {
-    removeDtDdByLabel(doc, [
-      "Dit document is ook beschikbaar in dit niet-normatieve formaat",
-      "This document is also available in these non-normative format",
-    ]);
-    removeLinksByHref(doc, [".pdf"]);
-    removeBlocksByText(doc, [
-      "Dit document is ook beschikbaar in dit niet-normatieve formaat",
-      "This document is also available in these non-normative format",
-    ]);
+  const h2 = createEl(doc, "h2", { text: statusHeading });
+  const p = createEl(doc, "p", { text: statusText });
+
+  sotd.appendChild(h2);
+  sotd.appendChild(p);
+}
+
+function injectArnhemHeadline(doc, config) {
+  const head = doc.querySelector(".head");
+  if (!head) return;
+
+  const existing = doc.querySelector(".arnhem-meta-line");
+  if (existing) existing.remove();
+
+  const statusKey = normalizeKey(config.specStatus || "basis");
+  const typeKey = normalizeKey(config.specType || "st");
+
+  const orgName =
+    config.nl_organisationName ||
+    arnhemOrganisationConfig.nl_organisationName;
+
+  const typeLabel =
+    config.localizationStrings?.nl?.[typeKey] ||
+    arnhemOrganisationConfig.localizationStrings.nl[typeKey] ||
+    String(config.specType || "Document");
+
+  const statusLabel =
+    config.localizationStrings?.nl?.[statusKey] ||
+    arnhemOrganisationConfig.localizationStrings.nl[statusKey] ||
+    String(config.specStatus || "");
+
+  const line = createEl(doc, "p", {
+    className: "arnhem-meta-line",
+    text: `${orgName} ${typeLabel} ${statusLabel}`.trim(),
+  });
+
+  const title = head.querySelector("h1");
+  if (title && title.parentNode) {
+    title.insertAdjacentElement("afterend", line);
+  } else {
+    head.prepend(line);
   }
 }
 
-function normalizeArnhemConfig(config) {
-  const normalized = { ...config };
+function injectArnhemSideLabel(doc, config) {
+  const existing = doc.querySelector(".arnhem-side-label");
+  if (existing) existing.remove();
 
-  const hideGitHub = normalized.github === false;
-  const hideLicense = normalized.license === false;
-  const hideAlternateFormats = normalized.alternateFormats === false;
+  if (config.useLabel === false) return;
 
-  /*
-    pubDomain "arnhem" accepteren als invoer,
-    maar intern mappen naar "st" om door de Logius validatie te komen.
-  */
-  if (typeof normalized.pubDomain === "string" && normalized.pubDomain.toLowerCase() === "arnhem") {
-    normalized._arnhemPubDomain = "arnhem";
-    normalized.pubDomain = "st";
+  const statusKey = normalizeKey(config.specStatus || "basis");
+  const typeKey = normalizeKey(config.specType || "st");
+
+  const typeLabel =
+    config.localizationStrings?.nl?.[typeKey] ||
+    arnhemOrganisationConfig.localizationStrings.nl[typeKey] ||
+    String(config.specType || "Document");
+
+  const statusLabel =
+    config.localizationStrings?.nl?.[statusKey] ||
+    arnhemOrganisationConfig.localizationStrings.nl[statusKey] ||
+    String(config.specStatus || "");
+
+  const labelColor =
+    config.labelColor?.[statusKey] ||
+    arnhemOrganisationConfig.labelColor[statusKey] ||
+    "#12636B";
+
+  const aside = createEl(doc, "aside", {
+    className: "arnhem-side-label",
+    text: `${typeLabel} ${statusLabel}`.trim(),
+  });
+
+  aside.setAttribute(
+    "style",
+    [
+      "position: fixed",
+      "left: 0",
+      "top: 140px",
+      "z-index: 10",
+      "writing-mode: vertical-rl",
+      "transform: rotate(180deg)",
+      "padding: 10px 8px",
+      "background: " + labelColor,
+      "color: white",
+      "font-family: Arial, sans-serif",
+      "font-size: 12px",
+      "line-height: 1.2",
+      "border-radius: 0 4px 4px 0",
+      "box-shadow: 0 1px 4px rgba(0,0,0,0.15)",
+    ].join(";")
+  );
+
+  doc.body.appendChild(aside);
+}
+
+function buildOtherLinks(config) {
+  const otherLinks = [];
+
+  if (config.github) {
+    otherLinks.push({
+      key: "Doe mee",
+      data: [
+        {
+          value: "GitHub",
+          href: config.github,
+        },
+      ],
+    });
   }
 
-  /*
-    Github is in de huidige Logius laag verplicht.
-    Daarom geven we tijdelijk een fallback mee,
-    en halen we het blok daarna weer weg in postProcess.
-  */
-  if (hideGitHub || !normalized.github) {
-    normalized.github = FALLBACK_GITHUB;
+  return otherLinks;
+}
+
+function pruneFalseOptions(config) {
+  const out = { ...config };
+
+  if (out.github === false) delete out.github;
+  if (out.license === false) delete out.license;
+  if (out.alternateFormats === false) delete out.alternateFormats;
+
+  return out;
+}
+
+function buildRespecConfig(merged) {
+  const config = pruneFalseOptions(merged);
+
+  const respecConfig = {
+    title: config.title,
+    shortName: config.shortName,
+    publishDate: config.publishDate,
+    pubDomain: config.pubDomain,
+    publishers: config.publishers || [],
+    editors: config.editors || [],
+    authors: config.authors || [],
+    logos: config.useLogo === false ? [] : (config.logos || []),
+    otherLinks: buildOtherLinks(config),
+    postProcess: [
+      ...(Array.isArray(config.postProcess) ? config.postProcess : []),
+      async (_config, doc, _utils) => {
+        injectSotd(doc, config);
+        injectArnhemHeadline(doc, config);
+        injectArnhemSideLabel(doc, config);
+      },
+    ],
+  };
+
+  if (config.latestVersion) {
+    respecConfig.latestVersion = config.latestVersion;
   }
 
-  /*
-    Licentie optioneel maken.
-    Bij false tijdelijke fallback,
-    daarna verwijderen we het zichtbare blok.
-  */
-  if (hideLicense || !normalized.license) {
-    normalized.license = FALLBACK_LICENSE;
+  if (Array.isArray(config.prevVersion) && config.prevVersion.length) {
+    respecConfig.prevVersion = config.prevVersion;
   }
 
-  /*
-    Alternate formats optioneel maken.
-    Bij false gewoon lege lijst.
-  */
-  if (hideAlternateFormats) {
-    normalized.alternateFormats = [];
+  if (config.github) {
+    respecConfig.github = config.github;
   }
 
-  const existingPostProcess = Array.isArray(normalized.postProcess)
-    ? normalized.postProcess
-    : [];
+  if (config.license) {
+    respecConfig.license = config.license;
+    respecConfig.licenses = config.licenses || ARNHEM_DEFAULT_LICENSES;
+  }
 
-  normalized.postProcess = [
-    ...existingPostProcess,
-    async doc => {
-      cleanupOptionalOutput(doc, {
-        hideGitHub,
-        hideLicense,
-        hideAlternateFormats,
-      });
-    },
-  ];
+  if (Array.isArray(config.alternateFormats) && config.alternateFormats.length) {
+    respecConfig.alternateFormats = config.alternateFormats;
+  }
 
-  return normalized;
+  if (config.localBiblio) {
+    respecConfig.localBiblio = config.localBiblio;
+  }
+
+  return respecConfig;
 }
 
 export function loadRespecWithConfiguration(documentConfig = {}) {
-  let mergedConfig = mergeDeep(arnhemOrganisationConfig, documentConfig);
+  const merged = mergeDeep(arnhemOrganisationConfig, documentConfig);
 
-  if (!mergedConfig.publishers) {
-    mergedConfig.publishers = [
-      {
-        name: "Gemeente Arnhem",
-        url: "https://www.arnhem.nl",
-      },
-    ];
+  if (!merged.publishers) {
+    merged.publishers = arnhemOrganisationConfig.publishers;
   }
 
-  mergedConfig = normalizeArnhemConfig(mergedConfig);
+  if (!merged.pubDomain) {
+    merged.pubDomain = "arnhem";
+  }
 
-  return loadLogiusRespecWithConfiguration(mergedConfig);
+  const respecConfig = buildRespecConfig(merged);
+
+  globalThis.respecConfig = respecConfig;
+  return respecConfig;
 }
 
-export { arnhemOrganisationConfig };
+export { arnhemOrganisationConfig, formatDutchDate };
