@@ -1,0 +1,367 @@
+/* ==========================================================================
+   Gemeente Arnhem, centrale ReSpec styling
+   Bestand: style/arnhem-respec.css
+   Doel: organisatiebrede styling voor ReSpec documenten
+   ========================================================================== */
+
+:root {
+  /* Basiskleuren Arnhem */
+  --arnhem-blauw-donker: #002469;
+  --arnhem-blauw-header: #275582;
+  --arnhem-blauw-link: #3174AF;
+  --arnhem-blauw-link-hover: #193A58;
+
+  --arnhem-groen-donker: #12636B;
+  --arnhem-groen-limoen: #C4DB0D;
+
+  --arnhem-oranje: #F27D00;
+  --arnhem-magenta: #A10082;
+  --arnhem-magenta-communicatie: #E6086E;
+  --arnhem-geel: #F7D417;
+  --arnhem-lichtblauw: #78B3E0;
+
+  /* Tekst en vlakken */
+  --arnhem-tekst: #4F4F4F;
+  --arnhem-wit: #FFFFFF;
+  --arnhem-achtergrond: #FFFFFF;
+  --arnhem-oppervlak-zacht: #F7F9FC;
+  --arnhem-rand: #D9E1EA;
+
+  /* Typografie */
+  --arnhem-font: Arial, sans-serif;
+  --arnhem-font-size-body: 14px;
+  --arnhem-font-size-h1: 30px;
+  --arnhem-font-size-h2: 18px;
+  --arnhem-font-size-h3: 14px;
+  --arnhem-line-height: 1.6;
+}
+
+/* ==========================================================================
+   Basis
+   ========================================================================== */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--arnhem-achtergrond);
+  color: var(--arnhem-tekst);
+  font-family: var(--arnhem-font);
+  font-size: var(--arnhem-font-size-body);
+  line-height: var(--arnhem-line-height);
+}
+
+body {
+  font-weight: 400;
+}
+
+/* Zorg voor een nette maximale breedte zonder ReSpec layout te slopen */
+#respec-document,
+main,
+body > .head,
+body > section,
+body > section.introductory {
+  max-width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   ReSpec documentkop
+   We stylen kleur en typografie, maar herschrijven de layout niet hard
+   ========================================================================== */
+
+.head {
+  background-color: var(--arnhem-blauw-header);
+  color: var(--arnhem-wit);
+  padding: 20px 24px;
+  border-bottom: 4px solid var(--arnhem-groen-limoen);
+  box-sizing: border-box;
+}
+
+.head .logos img {
+  max-height: 56px;
+  width: auto;
+}
+
+/* Hoofdtitel */
+.head h1 {
+  margin: 0 0 8px 0;
+  color: var(--arnhem-wit);
+  font-family: var(--arnhem-font);
+  font-size: var(--arnhem-font-size-h1);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+/* Subkoppen en documentmeta in kop */
+.head h2,
+.head p,
+.head dt,
+.head dd,
+.head li {
+  color: var(--arnhem-wit);
+  font-weight: 400;
+}
+
+/* Links in de kop, volgens huisstijl websites */
+.head a {
+  color: var(--arnhem-wit);
+  text-decoration: underline;
+}
+
+.head a:hover,
+.head a:focus {
+  color: var(--arnhem-groen-limoen);
+}
+
+/* Opsommingen in de kop */
+.head ul,
+.head ol {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  padding-left: 1.25em;
+}
+
+/* Definitielijsten in de kop */
+.head dl {
+  margin-top: 1em;
+  margin-bottom: 0;
+}
+
+.head dt {
+  font-weight: 400;
+}
+
+.head dd {
+  margin-bottom: 0.4em;
+}
+
+/* Statuslabel, subtiel maar zichtbaar */
+.status {
+  display: inline-block;
+  background: var(--arnhem-groen-limoen);
+  color: #000000;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 400;
+}
+
+/* ==========================================================================
+   Inhoud
+   ========================================================================== */
+
+section {
+  padding-left: 24px;
+  padding-right: 24px;
+  box-sizing: border-box;
+  margin-top: 2em;
+}
+
+/* H1 wordt meestal door ReSpec in de kop afgehandeld, maar toch veilig */
+h1 {
+  color: var(--arnhem-blauw-header);
+  font-family: var(--arnhem-font);
+  font-size: var(--arnhem-font-size-h1);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+/* H2, H3 volgens opgegeven groottes */
+h2 {
+  color: var(--arnhem-blauw-header);
+  font-family: var(--arnhem-font);
+  font-size: var(--arnhem-font-size-h2);
+  font-weight: 400;
+  line-height: 1.4;
+  margin-top: 2em;
+}
+
+h3 {
+  color: var(--arnhem-blauw-header);
+  font-family: var(--arnhem-font);
+  font-size: var(--arnhem-font-size-h3);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* Lopende tekst */
+p,
+li,
+dd,
+dt,
+td,
+th,
+blockquote {
+  color: var(--arnhem-tekst);
+  font-family: var(--arnhem-font);
+  font-size: var(--arnhem-font-size-body);
+  font-weight: 400;
+  line-height: var(--arnhem-line-height);
+}
+
+/* Beschrijvende tekst, zoals samenvatting en inleidende tekst */
+#abstract p,
+#sotd p,
+.introductory p {
+  color: var(--arnhem-blauw-link);
+}
+
+/* ==========================================================================
+   Links
+   ========================================================================== */
+
+a {
+  color: var(--arnhem-blauw-link);
+  text-decoration: underline;
+}
+
+a:hover,
+a:focus {
+  color: var(--arnhem-blauw-link-hover);
+}
+
+/* ==========================================================================
+   Inhoudsopgave
+   ========================================================================== */
+
+#toc {
+  font-size: 0.95em;
+}
+
+#toc a {
+  color: var(--arnhem-blauw-link);
+}
+
+#toc a:hover,
+#toc a:focus {
+  color: var(--arnhem-blauw-link-hover);
+}
+
+/* ==========================================================================
+   Tabellen
+   ========================================================================== */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+  background: var(--arnhem-wit);
+}
+
+th {
+  background: #EBF2FF;
+  color: var(--arnhem-tekst);
+  text-align: left;
+  font-weight: 400;
+}
+
+th,
+td {
+  border: 1px solid var(--arnhem-rand);
+  padding: 8px;
+  vertical-align: top;
+}
+
+/* ==========================================================================
+   Code, voorbeelden, noten
+   ========================================================================== */
+
+pre,
+code {
+  background: var(--arnhem-oppervlak-zacht);
+  border-radius: 4px;
+  font-family: Consolas, "Courier New", monospace;
+}
+
+code {
+  padding: 2px 6px;
+}
+
+pre {
+  padding: 12px;
+  overflow-x: auto;
+}
+
+/* ReSpec voorbeelden en notes wat rustiger stylen */
+.example,
+.note,
+.issue,
+.warning {
+  border-left: 4px solid var(--arnhem-groen-donker);
+  background: #EEFBFC;
+  padding: 12px 16px;
+  margin: 1em 0;
+}
+
+.warning {
+  border-left-color: var(--arnhem-oranje);
+  background: #FFF6ED;
+}
+
+.issue {
+  border-left-color: var(--arnhem-magenta);
+  background: #FEEBF4;
+}
+
+/* ==========================================================================
+   Figuren en afbeeldingen
+   ========================================================================== */
+
+figure {
+  margin: 1.5em 0;
+}
+
+figcaption {
+  color: var(--arnhem-tekst);
+  font-size: 0.95em;
+}
+
+/* ==========================================================================
+   Referenties en definities
+   ========================================================================== */
+
+dfn {
+  font-style: normal;
+  color: var(--arnhem-blauw-header);
+}
+
+/* Normatieve tekst zichtbaar houden */
+.normative {
+  color: #000000;
+  font-weight: 400;
+}
+
+/* ==========================================================================
+   Focus states, toegankelijk en zichtbaar
+   ========================================================================== */
+
+a:focus,
+button:focus,
+summary:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid var(--arnhem-groen-limoen);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Responsief
+   ========================================================================== */
+
+@media (max-width: 760px) {
+  .head {
+    padding: 16px;
+  }
+
+  .head h1 {
+    font-size: 24px;
+  }
+
+  section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
