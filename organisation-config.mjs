@@ -19,6 +19,16 @@ const arnhemOrganisationConfig = {
   useLogo: true,
   useLabel: true,
 
+  labelColor: {
+    def: "#12636B",
+    wv: "#12636B",
+    cv: "#12636B",
+    vv: "#12636B",
+    basis: "#12636B",
+    eo: "#12636B",
+    tg: "#12636B",
+  },
+
   localizationStrings: {
     nl: {
       wv: "Werkversie",
