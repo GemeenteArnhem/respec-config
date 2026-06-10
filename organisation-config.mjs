@@ -11,13 +11,13 @@ const arnhemOrganisationConfig = {
       alt: "Gemeente Arnhem",
       id: "Arnhem",
       height: 40,
-      width: 120,
+      width: 140,
       url: "https://www.arnhem.nl",
     },
   ],
 
   useLogo: true,
-  useLabel: false,
+  useLabel: true,
 
   localizationStrings: {
     nl: {
