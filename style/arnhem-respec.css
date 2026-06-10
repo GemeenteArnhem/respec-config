@@ -1,27 +1,14 @@
-/* ==========================================================================
-   Gemeente Arnhem, veilige ReSpec styling
-   Doel:
-   - Arnhem kleuren en typografie toepassen
-   - ReSpec layout intact laten
-   - TOC en navigatie niet kapot stylen
-   ========================================================================== */
-
+/* Arnhemse design tokens */
 :root {
   --arnhem-blue-dark: #002469;
   --arnhem-blue-header: #275582;
   --arnhem-link: #3174AF;
   --arnhem-link-hover: #193A58;
-
-  --arnhem-green-dark: #12636B;
   --arnhem-green-lime: #C4DB0D;
-
-  --arnhem-magenta: #A10082;
-  --arnhem-orange: #F27D00;
-
   --arnhem-text: #4F4F4F;
   --arnhem-bg: #FFFFFF;
-  --arnhem-surface: #F7F9FC;
   --arnhem-border: #D9E1EA;
+  --arnhem-surface: #F7F9FC;
 
   --arnhem-font: Arial, sans-serif;
   --arnhem-font-size-body: 14px;
@@ -31,10 +18,7 @@
   --arnhem-line-height: 1.6;
 }
 
-/* ==========================================================================
-   Basis
-   ========================================================================== */
-
+/* Basis */
 html,
 body {
   background: var(--arnhem-bg);
@@ -44,16 +28,39 @@ body {
   line-height: var(--arnhem-line-height);
 }
 
-/* ==========================================================================
-   Header, alleen visuele afwerking, geen layout-forcering
-   ========================================================================== */
-
+/* Harde reset van de documentkop */
 .head {
-  background: transparent;
-  color: var(--arnhem-text);
-  border-bottom: 2px solid var(--arnhem-green-lime);
-  padding-bottom: 1rem;
-  margin-bottom: 2rem;
+  background: transparent !important;
+  color: var(--arnhem-text) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--arnhem-border) !important;
+  margin: 0 0 2rem 0 !important;
+  padding: 0 0 1rem 0 !important;
+  box-shadow: none !important;
+}
+
+/* Alles in de kop weer normale documentstijl */
+.head h1,
+.head h2,
+.head h3,
+.head p,
+.head dt,
+.head dd,
+.head li,
+.head a,
+.head span {
+  color: var(--arnhem-text) !important;
+  background: transparent !important;
+}
+
+/* Titel volgens Arnhem huisstijl */
+.head h1 {
+  color: var(--arnhem-blue-header) !important;
+  font-family: var(--arnhem-font);
+  font-size: var(--arnhem-font-size-h1);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 0.5rem 0 !important;
 }
 
 /* Logo via ReSpec */
@@ -62,49 +69,26 @@ body {
   width: auto;
 }
 
-/* Titel */
-.head h1 {
-  color: var(--arnhem-blue-header);
-  font-family: var(--arnhem-font);
-  font-size: var(--arnhem-font-size-h1);
-  font-weight: 400;
-  line-height: 1.2;
-  margin-bottom: 0.5rem;
-}
-
-/* Meta informatie in normale documentstijl */
-.head h2,
-.head p,
-.head dt,
-.head dd,
-.head li {
-  color: var(--arnhem-text);
-  font-weight: 400;
-}
-
-/* Links in de kop */
-.head a {
+/* Links */
+a {
   color: var(--arnhem-link);
 }
 
-.head a:hover,
-.head a:focus {
+a:hover,
+a:focus {
   color: var(--arnhem-link-hover);
+  text-decoration: underline;
 }
 
-/* Status label */
+/* Statuslabel alleen subtiel */
 .status {
-  display: inline-block;
   background: var(--arnhem-green-lime);
   color: #000000;
   padding: 4px 8px;
   border-radius: 4px;
 }
 
-/* ==========================================================================
-   Koppen
-   ========================================================================== */
-
+/* Koppen */
 h1 {
   color: var(--arnhem-blue-header);
   font-family: var(--arnhem-font);
@@ -126,10 +110,7 @@ h3 {
   font-weight: 400;
 }
 
-/* ==========================================================================
-   Lopende tekst
-   ========================================================================== */
-
+/* Tekst */
 p,
 li,
 dt,
@@ -144,47 +125,25 @@ blockquote {
   line-height: var(--arnhem-line-height);
 }
 
-/* Samenvatting en sotd tekst iets subtieler */
-#abstract p,
-#sotd p {
-  color: var(--arnhem-link);
-}
-
-/* ==========================================================================
-   Links
-   ========================================================================== */
-
-a {
-  color: var(--arnhem-link);
-}
-
-a:hover,
-a:focus {
-  color: var(--arnhem-link-hover);
-  text-decoration: underline;
-}
-
-/* ==========================================================================
-   TOC, alleen kleur en lettergrootte, geen layout
-   ========================================================================== */
-
-#toc {
+/* TOC alleen kleur, geen layout */
+#toc,
+.toc {
   font-size: 0.95em;
 }
 
-#toc a {
+#toc a,
+.toc a {
   color: var(--arnhem-link);
 }
 
 #toc a:hover,
-#toc a:focus {
+#toc a:focus,
+.toc a:hover,
+.toc a:focus {
   color: var(--arnhem-link-hover);
 }
 
-/* ==========================================================================
-   Tabellen
-   ========================================================================== */
-
+/* Tabellen */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -206,15 +165,11 @@ td {
   vertical-align: top;
 }
 
-/* ==========================================================================
-   Code
-   ========================================================================== */
-
+/* Code */
 pre,
 code {
   background: var(--arnhem-surface);
   border-radius: 4px;
-  font-family: Consolas, "Courier New", monospace;
 }
 
 code {
@@ -226,58 +181,8 @@ pre {
   overflow-x: auto;
 }
 
-/* ==========================================================================
-   ReSpec blokken
-   ========================================================================== */
-
-.example,
-.note,
-.issue,
-.warning {
-  padding: 12px 16px;
-  margin: 1em 0;
-  border-left: 4px solid var(--arnhem-green-dark);
-  background: #EEFBFC;
+/* Niets verbergen van ReSpec navigatie */
+aside {
+  display: block !important;
 }
-
-.warning {
-  border-left-color: var(--arnhem-orange);
-  background: #FFF6ED;
-}
-
-.issue {
-  border-left-color: var(--arnhem-magenta);
-  background: #FEEBF4;
-}
-
-/* ==========================================================================
-   Figuren en definities
-   ========================================================================== */
-
-figure {
-  margin: 1.5em 0;
-}
-
-figcaption {
-  color: var(--arnhem-text);
-  font-size: 0.95em;
-}
-
-dfn {
-  color: var(--arnhem-blue-header);
-  font-style: normal;
-}
-
-/* ==========================================================================
-   Toegankelijke focus
-   ========================================================================== */
-
-a:focus,
-button:focus,
-summary:focus,
-input:focus,
-select:focus,
-textarea:focus {
-  outline: 3px solid var(--arnhem-green-lime);
-  outline-offset: 2px;
-}
+   Gemeente Arnhem, minimale en veilige ReSpec styling
