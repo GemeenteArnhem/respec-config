@@ -21,7 +21,7 @@ const arnhemOrganisationConfig = {
   /* Logo */
   logos: [
     {
-      src: "https://gemeentearnhem.github.io/respec-config/style/logos/arnhem-logo.webp",
+      src: "https://gemeentearnhem.github.io/respec-config/style/logos/arnhem-logo.png",
       alt: "Gemeente Arnhem",
       id: "Arnhem",
       height: 77,
